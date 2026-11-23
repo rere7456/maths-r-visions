@@ -711,7 +711,29 @@
   }
 
   function restartQuiz() {
-    currentQuiz = allQuiz.filter(q => quizFilter === 'all' || q.ch === quizFilter);
+    // 1. Filtrer selon le chapitre choisi
+    const filtered = allQuiz.filter(q => quizFilter === 'all' || q.ch === quizFilter);
+
+    // 2. Cloner et mélanger l'ordre des réponses (options) pour chaque question
+    currentQuiz = filtered.map(q => {
+      const indexedOpts = q.opts.map((opt, idx) => ({ opt, isCorrect: idx === q.ans }));
+      for (let i = indexedOpts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexedOpts[i], indexedOpts[j]] = [indexedOpts[j], indexedOpts[i]];
+      }
+      return {
+        ...q,
+        opts: indexedOpts.map(o => o.opt),
+        ans: indexedOpts.findIndex(o => o.isCorrect)
+      };
+    });
+
+    // 3. Mélanger également l'ordre des questions pour varier à chaque partie
+    for (let i = currentQuiz.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [currentQuiz[i], currentQuiz[j]] = [currentQuiz[j], currentQuiz[i]];
+    }
+
     qIdx = 0;
     score = 0;
     mistakes = [];
