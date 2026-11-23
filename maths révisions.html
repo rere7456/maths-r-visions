@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Révision Complète — Chap 3 & 4 (STD2A)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card2: #273449;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #a855f7;
+      --ok: #22c55e;
+      --bad: #ef4444;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      padding: 16px; max-width: 980px; margin-inline: auto; line-height: 1.55;
+    }
+    header { text-align: center; margin-bottom: 18px; }
+    h1 { font-size: 1.55rem; margin: 0 0 6px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; color: transparent; }
+    .sub { color: var(--muted); font-size: 0.92rem; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn {
+      background: var(--card); color: var(--text); border: 1px solid #334155;
+      padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.95rem;
+      transition: 0.2s;
+    }
+    .tab-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0f172a; border-color: transparent; }
+    .section { display: none; }
+    .section.active { display: block; animation: fade 0.2s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Math formatting */
+    .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; font-size: 0.9em; }
+    .frac span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 4px; }
+    .frac span:last-child { padding: 0 4px; }
+    .formula {
+      display: inline-block; background: #0f172a; border: 1px solid #334155;
+      padding: 4px 10px; border-radius: 8px; font-weight: 700; color: var(--accent); margin: 3px 0;
+    }
+
+    /* Fiches détaillées */
+    .chap-switch { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .pill {
+      background: var(--card2); border: 1px solid #475569; color: var(--text);
+      padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 0.86rem; font-weight: 600;
+    }
+    .pill.active { background: var(--accent); color: #0f172a; border-color: transparent; }
+
+    .fiche-list { display: flex; flex-direction: column; gap: 16px; }
+    .box {
+      background: var(--card); border: 1px solid #334155; border-radius: 16px; padding: 18px 20px;
+    }
+    .box h2 { margin: 0 0 12px; font-size: 1.12rem; color: var(--accent); border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    .box.ch4 h2 { color: #c084fc; }
+    .box ul { margin: 0 0 8px; padding-left: 20px; }
+    .box li { margin-bottom: 6px; font-size: 0.94rem; }
+
+    .example-box {
+      background: #0f172a; border: 1px solid #334155; border-left: 4px solid var(--accent);
+      border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 0.91rem;
+    }
+    .box.ch4 .example-box { border-left-color: #c084fc; }
+    .ex-title { font-weight: 700; color: var(--accent); margin-bottom: 4px; display: block; }
+    .box.ch4 .ex-title { color: #c084fc; }
+
+    .tip {
+      background: rgba(245, 158, 11, 0.12); border-left: 4px solid var(--warn);
+      padding: 10px 12px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem;
+    }
+    .redac {
+      background: rgba(34, 197, 94, 0.1); border-left: 4px solid var(--ok);
+      padding: 10px 12px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem;
+    }
+    .schema {
+      background: #0f172a; border: 1px dashed #475569; border-radius: 10px;
+      padding: 10px; text-align: center; margin: 10px 0; font-size: 0.9rem; overflow-x: auto;
+    }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 8px; }
+    .mini-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; }
+
+    /* Flashcards */
+    .fc-wrap { max-width: 600px; margin: 0 auto; text-align: center; }
+    .fc-stats { color: var(--muted); font-size: 0.9rem; margin-bottom: 10px; }
+    .flashcard {
+      background: var(--card); border: 2px solid #334155; border-radius: 20px;
+      min-height: 230px; padding: 28px 20px; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+      user-select: none; position: relative;
+    }
+    .flashcard:hover { border-color: var(--accent); }
+    .flashcard.flipped { background: #172554; border-color: #60a5fa; }
+    .fc-badge {
+      position: absolute; top: 12px; left: 14px; font-size: 0.75rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px; background: var(--card2); color: var(--accent);
+    }
+    .fc-hint { position: absolute; bottom: 10px; font-size: 0.78rem; color: var(--muted); }
+    .fc-content { font-size: 1.08rem; font-weight: 600; }
+    .fc-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+    .btn {
+      border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.92rem;
+    }
+    .btn-ok { background: var(--ok); color: #052e16; }
+    .btn-warn { background: var(--warn); color: #451a03; }
+    .btn-neutral { background: var(--card2); color: var(--text); border: 1px solid #475569; }
+
+    /* Quiz */
+    .quiz-wrap { max-width: 680px; margin: 0 auto; background: var(--card); border: 1px solid #334155; border-radius: 18px; padding: 20px; }
+    .q-head { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.88rem; margin-bottom: 10px; }
+    .progress-bar { width: 100%; height: 6px; background: #0f172a; border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: 0.3s; }
+    .q-tag { display: inline-block; font-size: 0.76rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--card2); color: var(--accent); margin-bottom: 8px; }
+    .q-text { font-size: 1.08rem; font-weight: 600; margin-bottom: 16px; }
+    .opts { display: flex; flex-direction: column; gap: 10px; }
+    .opt {
+      text-align: left; background: var(--card2); color: var(--text); border: 1px solid #475569;
+      padding: 12px 14px; border-radius: 12px; cursor: pointer; font-size: 0.95rem; transition: 0.15s;
+    }
+    .opt:hover:not(:disabled) { border-color: var(--accent); }
+    .opt.correct { background: rgba(34, 197, 94, 0.2); border-color: var(--ok); color: #bbf7d0; }
+    .opt.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--bad); color: #fecaca; }
+    .explain {
+      margin-top: 14px; padding: 12px; border-radius: 10px; background: #0f172a;
+      border-left: 3px solid var(--accent); font-size: 0.92rem; display: none;
+    }
+    .next-btn { margin-top: 14px; width: 100%; background: var(--accent); color: #0f172a; display: none; }
+    .score-box { text-align: center; padding: 14px 0; }
+    .score-big { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+    .mistake-list { text-align: left; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .mistake-item { background: #0f172a; border: 1px solid #334155; border-left: 3px solid var(--bad); padding: 10px 12px; border-radius: 8px; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Révision Complète — Terminale STD2A</h1>
+    <div class="sub">Chapitre 3 (Suites géométriques) & Chapitre 4 (Fonction exponentielle de base a)</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('fiches', this)">📖 Fiches Détaillées</button>
+    <button class="tab-btn" onclick="showTab('cards', this)">🃏 Flashcards (17)</button>
+    <button class="tab-btn" onclick="showTab('quiz', this)">🎯 Gros QCM (34 questions)</button>
+  </div>
+
+  <!-- SECTION 1 : FICHES DETAILLEES -->
+  <div id="fiches" class="section active">
+    <div class="chap-switch">
+      <button class="pill active" onclick="filterFiches('all', this)">Tout voir</button>
+      <button class="pill" onclick="filterFiches('ch3', this)">Chapitre 3 : Suites géométriques</button>
+      <button class="pill" onclick="filterFiches('ch4', this)">Chapitre 4 : Exponentielle de base a</button>
+    </div>
+
+    <div class="fiche-list">
+
+      <!-- CHAP 3 -->
+      <div class="box fiche-item ch3">
+        <h2>🧱 Chap 3 — 1. Définition & Démontrer qu’une suite est géométrique</h2>
+        <ul>
+          <li><b>Définition 1 :</b> Une suite (u<sub>n</sub>) définie à partir du rang n<sub>0</sub> est <b>géométrique</b> s’il existe un réel <b>q</b> (la <b>raison</b>) tel que, pour tout entier naturel n ≥ n<sub>0</sub> : <span class="formula">u<sub>n+1</sub> = q × u<sub>n</sub></span>.</li>
+          <li><b>Exemple 1 :</b> Si u<sub>0</sub> = 1 et u<sub>n+1</sub> = 2u<sub>n</sub>, alors (u<sub>n</sub>) est géométrique de premier terme u<sub>0</sub> = 1 et de raison q = 2.</li>
+          <li><b>Remarque 1 (méthode) :</b> Pour démontrer qu’une suite (u<sub>n</sub>) à termes non nuls est géométrique, il suffit de montrer que, pour tout n ≥ n<sub>0</sub>, le quotient <span class="frac"><span>u<sub>n+1</sub></span><span>u<sub>n</sub></span></span> est <b>constant</b> (il prend toujours la même valeur).</li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemple 2 du cours (rédaction exacte) :</span>
+          On donne u<sub>n</sub> = 3<sup>n</sup>. Montrer que (u<sub>n</sub>) est géométrique.<br>
+          <b>1.</b> u<sub>n</sub> = 3<sup>n</sup> et u<sub>n+1</sub> = 3<sup>n+1</sup>.<br>
+          <b>2.</b> On calcule : <span class="frac"><span>u<sub>n+1</sub></span><span>u<sub>n</sub></span></span> = <span class="frac"><span>3<sup>n+1</sup></span><span>3<sup>n</sup></span></span> = <span class="frac"><span>3<sup>n</sup> × 3<sup>1</sup></span><span>3<sup>n</sup></span></span> = 3<sup>1</sup> = <b>3 = cste = q</b>.<br>
+          <b>3.</b> <i>Conclusion :</i> Le quotient <span class="frac"><span>u<sub>n+1</sub></span><span>u<sub>n</sub></span></span> est constant pour tout n, donc (u<sub>n</sub>) est une suite géométrique de raison q = 3 (et de premier terme u<sub>0</sub> = 3<sup>0</sup> = 1).
+        </div>
+      </div>
+
+      <div class="box fiche-item ch3">
+        <h2>⚖️ Chap 3 — 2. Moyenne géométrique & 3 termes consécutifs</h2>
+        <ul>
+          <li><b>Définition 2 :</b> La <b>moyenne géométrique</b> de deux nombres positifs a et b est égale à <span class="formula">√(a × b)</span>.</li>
+          <li><b>Propriété 1 :</b> Trois nombres positifs a, b et c sont, dans cet ordre, les termes consécutifs d’une suite géométrique <b>si et seulement si</b> le terme du milieu b est égal à la moyenne géométrique de a et c : <span class="formula">b = √(a × c)</span>.</li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemples 3 & 4 du cours :</span>
+          • Moyenne géométrique de 4 et 9 : √(4 × 9) = √36 = <b>6</b>.<br>
+          • Les nombres <b>9, 12 et 16</b> sont-ils termes consécutifs d’une suite géométrique ?<br>
+          On calcule : √(9 × 16) = √144 = <b>12</b>.<br>
+          12 étant le terme du milieu, alors ces 3 termes sont bien les termes consécutifs d’une suite géométrique de raison q = <span class="frac"><span>12</span><span>9</span></span> = <span class="frac"><span>4</span><span>3</span></span>.
+        </div>
+      </div>
+
+      <div class="box fiche-item ch3">
+        <h2>🚀 Chap 3 — 3. Formules explicites (calculer u<sub>n</sub> directement)</h2>
+        <div class="schema">
+          u<sub>0</sub> ──(×q)──▶ u<sub>1</sub> ──(×q)──▶ u<sub>2</sub> ──(×q)──▶ u<sub>3</sub> ─── … ───▶ u<sub>n</sub> ──(×q)──▶ u<sub>n+1</sub>
+        </div>
+        <ul>
+          <li><b>Propriété 2 (à partir de u<sub>0</sub>) :</b> pour tout entier naturel n, <span class="formula">u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup></span>.</li>
+          <li><b>Plus généralement :</b> pour tous entiers naturels n et p tels que n ≥ p : <span class="formula">u<sub>n</sub> = u<sub>p</sub> × q<sup>n−p</sup></span>.</li>
+          <li><b>Application à partir de u<sub>1</sub> (annotation) :</b> <span class="formula">u<sub>n</sub> = u<sub>1</sub> × q<sup>n−1</sup></span>.</li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemple 5 du cours & application :</span>
+          • Si u<sub>0</sub> = 1 et q = 2 : pour tout entier n, u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup> = 1 × 2<sup>n</sup> = 2<sup>n</sup>, donc u<sub>10</sub> = 2<sup>10</sup> = <b>1 024</b>.<br>
+          • Si u<sub>3</sub> = 4 et q = 3, pour trouver u<sub>7</sub> : u<sub>7</sub> = u<sub>3</sub> × q<sup>7−3</sup> = 4 × 3<sup>4</sup> = 4 × 81 = <b>324</b>.
+        </div>
+      </div>
+
+      <div class="box fiche-item ch3">
+        <h2>📊 Chap 3 — 4. Représentation graphique & Somme des termes</h2>
+        <ul>
+          <li><b>Graphique (Exemple 6) :</b> On place les points de coordonnées (n ; u<sub>n</sub>) dans un repère (ex : (0 ; 1), (1 ; 2), (2 ; 4), (3 ; 8), (4 ; 16)). Ce sont des <b>points isolés</b> (<b>on ne les relie pas</b>).</li>
+          <li><b>Remarque 2 :</b> Un phénomène dont l’évolution peut être modélisée par une suite géométrique est à <b>croissance exponentielle</b>.</li>
+          <li><b>Propriété 3 (Somme, pour q ≠ 1) :</b> S = u<sub>0</sub> + u<sub>1</sub> + … + u<sub>n−1</sub> = ∑<sub>k=0</sub><sup>n−1</sup> u<sub>k</sub> = u<sub>0</sub> × <span class="frac"><span>1 − q<sup>n</sup></span><span>1 − q</span></span>.</li>
+          <li><b>Forme à retenir :</b> <span class="formula">S = premier terme × <span class="frac"><span>1 − q<sup>nombre de termes</sup></span><span>1 − q</span></span></span></li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemple 7 du cours : Calculer S = u<sub>0</sub> + u<sub>1</sub> + … + u<sub>9</sub> avec u<sub>0</sub> = 1 et q = 2</span>
+          • Combien de termes ? De l’indice 0 à 9, il y a <b>10 termes</b>.<br>
+          • S = u<sub>0</sub> × <span class="frac"><span>1 − q<sup>10</sup></span><span>1 − q</span></span> = 1 × <span class="frac"><span>1 − 2<sup>10</sup></span><span>1 − 2</span></span> = <span class="frac"><span>1 − 2<sup>10</sup></span><span>−1</span></span> = −(1 − 2<sup>10</sup>) = 2<sup>10</sup> − 1 = 1024 − 1 = <b>1 023</b>.
+        </div>
+        <div class="tip">⚠️ <b>Piège classique :</b> De u<sub>0</sub> à u<sub>k</sub> il y a <b>k + 1</b> termes ; de u<sub>1</sub> à u<sub>k</sub> il y a <b>k</b> termes.</div>
+      </div>
+
+      <!-- CHAP 4 -->
+      <div class="box ch4 fiche-item">
+        <h2>✨ Chap 4 — 1. Définition, Courbe fluide, Valeurs & Signe</h2>
+        <ul>
+          <li>Dans tout le chapitre, <b>a est un nombre réel strictement positif (a > 0)</b>.</li>
+          <li><b>Définition 1 :</b> La fonction exponentielle de base a (notée <b>x ↦ a<sup>x</sup></b>) est définie :
+            <br>• pour tout réel x > 0 comme le <b>prolongement</b> (courbe « fluide ») de la suite géométrique de premier terme u<sub>0</sub> = 1 et de raison a (la courbe passe par <b>(0 ; 1)</b> et <b>(1 ; a)</b>) ;
+            <br>• pour tout réel négatif en posant, pour tout réel x positif : <span class="formula">a<sup>−x</sup> = <span class="frac"><span>1</span><span>a<sup>x</sup></span></span></span>.
+          </li>
+          <li><b>Remarque 1 :</b> <span class="formula">a<sup>0</sup> = 1</span> &nbsp;|&nbsp; <span class="formula">a<sup>1</sup> = a</span> &nbsp;|&nbsp; <span class="formula">1<sup>x</sup> = 1</span> (la fonction exponentielle de base 1 est la <b>fonction constante égale à 1</b>).</li>
+          <li><b>Signe :</b> Comme a > 0, pour tout réel x, <span class="formula">a<sup>x</sup> > 0</span>. Elle est <b>toujours strictement positive</b> ; sa courbe est <b>toujours au-dessus de l’axe des abscisses</b>.</li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemple 1 du cours (f(x) = 1,2<sup>x</sup>, valeurs exactes et arrondies au millième) :</span>
+          • f(3) = 1,2<sup>3</sup> = 1,728 (exact) &nbsp;|&nbsp; f(4,5) = 1,2<sup>4,5</sup> ≈ 2,272<br>
+          • f(<span class="frac"><span>2</span><span>3</span></span>) = 1,2<sup>2/3</sup> ≈ 1,129 &nbsp;|&nbsp; f(−4,5) = 1,2<sup>−4,5</sup> = <span class="frac"><span>1</span><span>1,2<sup>4,5</sup></span></span> ≈ 0,440
+        </div>
+      </div>
+
+      <div class="box ch4 fiche-item">
+        <h2>🧰 Chap 4 — 2. Propriétés algébriques & Conséquences (Racines)</h2>
+        <p style="margin:0 0 8px;font-size:0.93rem;">Pour tous réels strictement positifs a et b et pour tous réels x et y :</p>
+        <div class="two-col">
+          <div class="mini-card">
+            <b>Même base :</b><br>
+            • a<sup>x</sup> × a<sup>y</sup> = a<sup>x+y</sup><br>
+            • <span class="frac"><span>a<sup>x</sup></span><span>a<sup>y</sup></span></span> = a<sup>x−y</sup><br>
+            • <span class="frac"><span>1</span><span>a<sup>x</sup></span></span> = a<sup>−x</sup><br>
+            • (a<sup>x</sup>)<sup>y</sup> = a<sup>x×y</sup>
+          </div>
+          <div class="mini-card">
+            <b>Même exposant & Racines (n ∈ ℕ*) :</b><br>
+            • a<sup>x</sup> × b<sup>x</sup> = (a × b)<sup>x</sup> &nbsp;|&nbsp; <span class="frac"><span>a<sup>x</sup></span><span>b<sup>x</sup></span></span> = (<span class="frac"><span>a</span><span>b</span></span>)<sup>x</sup><br>
+            • (a<sup>n</sup>)<sup>1/n</sup> = a<sup>n × 1/n</sup> = a<sup>1</sup> = a<br>
+            • <b>a<sup>1/2</sup> = √a</b> &nbsp;(car (a<sup>1/2</sup>)<sup>2</sup> = (√a)<sup>2</sup> = a)<br>
+            • <b><sup>n</sup>√A = A<sup>1/n</sup></b> &nbsp;et&nbsp; (<sup>n</sup>√A)<sup>n</sup> = A
+          </div>
+        </div>
+        <div class="example-box">
+          <span class="ex-title">📌 Exemple 2 du cours (écrire sous la forme a<sup>x</sup>) :</span>
+          • 3<sup>1,8</sup> × 3<sup>2,2</sup> = 3<sup>1,8+2,2</sup> = <b>3<sup>4</sup></b><br>
+          • <span class="frac"><span>5<sup>1,2</sup></span><span>5<sup>−2,2</sup></span></span> = 5<sup>1,2−(−2,2)</sup> = 5<sup>1,2+2,2</sup> = <b>5<sup>3,4</sup></b> &nbsp;&nbsp;<i>(attention au « − (−) » qui devient « + » !)</i><br>
+          • <span class="frac"><span>1</span><span>0,56<sup>−2</sup></span></span> = <b>0,56<sup>2</sup></b> &nbsp;&nbsp;|&nbsp;&nbsp; (5,7<sup>−3</sup>)<sup>0,2</sup> = 5,7<sup>−3×0,2</sup> = <b>5,7<sup>−0,6</sup></b><br>
+          • (√3<sup>1,2</sup>)<sup>5</sup> = ((3<sup>1/2</sup>)<sup>1,2</sup>)<sup>5</sup> = 3<sup>1/2 × 1,2 × 5</sup> = <b>3<sup>3</sup></b><br>
+          • 3<sup>1,4</sup> × 2,1<sup>1,4</sup> = (3 × 2,1)<sup>1,4</sup> = <b>6,3<sup>1,4</sup></b> &nbsp;&nbsp;|&nbsp;&nbsp; <span class="frac"><span>3,6<sup>1,01</sup></span><span>0,9<sup>1,01</sup></span></span> = (<span class="frac"><span>3,6</span><span>0,9</span></span>)<sup>1,01</sup> = <b>4<sup>1,01</sup></b><br>
+          • <span class="frac"><span>2,3<sup>4,1</sup> × 2,3<sup>3,2</sup></span><span>2,3<sup>1,56</sup></span></span> = <span class="frac"><span>2,3<sup>7,3</sup></span><span>2,3<sup>1,56</sup></span></span> = 2,3<sup>7,3−1,56</sup> = <b>2,3<sup>5,74</sup></b>
+        </div>
+      </div>
+
+      <div class="box ch4 fiche-item">
+        <h2>📈 Chap 4 — 3. Sens de variation & Allure de la courbe</h2>
+        <ul>
+          <li><b>Propriété 2 (x ↦ a<sup>x</sup>) :</b>
+            <br>• Si <b>a > 1</b> : strictement <b>croissante</b> sur ℝ (ex : y = 1,3<sup>x</sup>).
+            <br>• Si <b>0 < a < 1</b> : strictement <b>décroissante</b> sur ℝ (ex : y = 0,7<sup>x</sup>).
+          </li>
+          <li><b>Propriété 3 (x ↦ k × a<sup>x</sup>, avec k non nul) :</b>
+            <br>• Si <b>k > 0</b> : les fonctions x ↦ k a<sup>x</sup> et x ↦ a<sup>x</sup> ont le <b>même sens de variation</b>.
+            <br>• Si <b>k < 0</b> : les fonctions x ↦ k a<sup>x</sup> et x ↦ a<sup>x</sup> ont un <b>sens de variation contraire</b>.
+          </li>
+        </ul>
+        <div class="redac">
+          <b>✍️ Les 4 cas types de l’Exemple 4 (rédaction exacte) :</b><br>
+          • <b>a > 1 et k > 0</b> (ex : 3 × 1,2<sup>x</sup>) : 1,2<sup>x</sup> est strict. croissante, k > 0 (même sens) ⇒ <b>strict. croissante sur ℝ</b>.<br>
+          • <b>a > 1 et k < 0</b> (ex : −0,5 × 4<sup>x</sup>) : 4<sup>x</sup> est strict. croissante, k < 0 (sens contraire) ⇒ <b>strict. décroissante sur ℝ</b>.<br>
+          • <b>0 < a < 1 et k > 0</b> (ex : 1,3 × 0,8<sup>x</sup>) : 0,8<sup>x</sup> est strict. décroissante, k > 0 (même sens) ⇒ <b>strict. décroissante sur ℝ</b>.<br>
+          • <b>0 < a < 1 et k < 0</b> (ex : −5 × 0,4<sup>x</sup>) : 0,4<sup>x</sup> est strict. décroissante, k < 0 (sens contraire) ⇒ <b>strict. croissante sur ℝ</b>.
+        </div>
+      </div>
+
+      <div class="box ch4 fiche-item">
+        <h2>💸 Chap 4 — 4. Application au calcul du taux d’évolution moyen</h2>
+        <div class="schema">
+          V<sub>0</sub> ──(× C<sub>1</sub>)──▶ V<sub>1</sub> ──(× C<sub>2</sub>)──▶ V<sub>2</sub> ─── … ───▶ V<sub>n−1</sub> ──(× C<sub>n</sub>)──▶ V<sub>n</sub><br>
+          └──────────────────────( × C<sub>M</sub><sup>n</sup> = coefficient multiplicateur global )──────────────────────┘
+        </div>
+        <ul>
+          <li><b>Définition 2 :</b> Si n évolutions successives (t<sub>1</sub>%, …, t<sub>n</sub>%) font passer de V<sub>0</sub> à V<sub>n</sub>, le <b>taux d’évolution moyen t<sub>M</sub>%</b> est le taux unique qu’il faut appliquer n fois de suite à V<sub>0</sub> pour obtenir V<sub>n</sub>.</li>
+          <li><b>Propriété 4 :</b> <span class="formula">C<sub>M</sub><sup>n</sup> = C<sub>1</sub> × C<sub>2</sub> × … × C<sub>n</sub> = C<sub>global</sub></span>, d’où <span class="formula">C<sub>M</sub> = <sup>n</sup>√C<sub>global</sub> = (C<sub>global</sub>)<sup>1/n</sup></span>.</li>
+        </ul>
+        <div class="example-box">
+          <span class="ex-title">📌 Les 2 cas du cours (Introduction & Exemple 5) :</span>
+          <b>Cas A — Plusieurs taux successifs :</b> Hausses de 16 %, 15 % et 20 % (3 ans).<br>
+          1) Coeffs : × 1,16 ; × 1,15 ; × 1,20 ⇒ Coeff global = 1,16 × 1,15 × 1,20 = <b>1,6008</b>.<br>
+          2) Équation : C<sub>M</sub><sup>3</sup> = 1,6008 ⇒ C<sub>M</sub> = <sup>3</sup>√1,6008 ≈ <b>1,17</b> ⇒ hausse moyenne de <b>17 %</b> par an.<br><br>
+          <b>Cas B — Évolution globale sur n ans :</b> Un produit augmente de 20 % en 10 ans.<br>
+          1) En 10 ans, hausse de 20 % ⇒ C<sub>M</sub><sup>10</sup> = <b>1,2</b>.<br>
+          2) Donc C<sub>M</sub> = <sup>10</sup>√1,2 = 1,2<sup>1/10</sup> ≈ <b>1,0184</b> ⇒ hausse moyenne de <b>1,84 %</b> par an.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2 : FLASHCARDS -->
+  <div id="cards" class="section">
+    <div class="chap-switch">
+      <button class="pill active" onclick="setCardFilter('all', this)">Toutes (17)</button>
+      <button class="pill" onclick="setCardFilter('ch3', this)">Chap 3 (7)</button>
+      <button class="pill" onclick="setCardFilter('ch4', this)">Chap 4 (10)</button>
+    </div>
+
+    <div class="fc-wrap">
+      <div class="fc-stats" id="fcStats"></div>
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <span class="fc-badge" id="fcBadge"></span>
+        <div class="fc-content" id="fcContent"></div>
+        <div class="fc-hint" id="fcHint">Clique sur la carte pour voir la réponse</div>
+      </div>
+      <div class="fc-actions">
+        <button class="btn btn-warn" onclick="markCard(false)">🔁 À revoir</button>
+        <button class="btn btn-ok" onclick="markCard(true)">✅ C’est bon</button>
+        <button class="btn btn-neutral" onclick="resetCards()">↺ Tout remettre</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 : QCM 34 QUESTIONS -->
+  <div id="quiz" class="section">
+    <div class="chap-switch">
+      <button class="pill active" onclick="setQuizFilter('all', this)">Tout le QCM (34)</button>
+      <button class="pill" onclick="setQuizFilter('ch3', this)">Chap 3 uniquement (16)</button>
+      <button class="pill" onclick="setQuizFilter('ch4', this)">Chap 4 uniquement (18)</button>
+    </div>
+    <div class="quiz-wrap" id="quizBox"></div>
+  </div>
+
+<script>
+  // --- NAVIGATION ---
+  function showTab(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function filterFiches(filter, btn) {
+    btn.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.fiche-item').forEach(el => {
+      el.style.display = (filter === 'all' || el.classList.contains(filter)) ? 'block' : 'none';
+    });
+  }
+
+  // --- FLASHCARDS (17 cartes : toutes les notions) ---
+  const allCards = [
+    { ch: 'ch3', tag: 'Chap 3', q: 'Relation de récurrence d’une suite géométrique de raison q ?', a: 'u<sub>n+1</sub> = q × u<sub>n</sub> (pour tout n ≥ n<sub>0</sub>)' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Comment démontrer qu’une suite (à termes non nuls) est géométrique ?', a: 'Calculer u<sub>n+1</sub> / u<sub>n</sub> et montrer que ce quotient est constant (= q).' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Moyenne géométrique de deux nombres positifs a et b ?', a: '√(a × b)<br><small>(Ex : pour 4 et 9 → √36 = 6)</small>' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Condition pour que a, b, c > 0 soient termes consécutifs d’une suite géométrique ?', a: 'b = √(a × c) (le milieu est la moyenne géométrique).<br>Raison : q = b / a.' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Les 3 formules explicites : à partir de u<sub>0</sub>, de u<sub>1</sub>, et de u<sub>p</sub> (n ≥ p) ?', a: 'u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup><br>u<sub>n</sub> = u<sub>1</sub> × q<sup>n−1</sup><br>u<sub>n</sub> = u<sub>p</sub> × q<sup>n−p</sup>' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Comment trace-t-on une suite géométrique et comment appelle-t-on ce phénomène ?', a: 'Des points isolés (n ; u<sub>n</sub>), sans les relier.<br>Phénomène à <b>croissance exponentielle</b>.' },
+    { ch: 'ch3', tag: 'Chap 3', q: 'Formule de la somme des termes d’une suite géométrique (q ≠ 1) ?', a: 'S = 1<sup>er</sup> terme × (1 − q<sup>nombre de termes</sup>) / (1 − q)<br><small>(De u<sub>0</sub> à u<sub>n−1</sub>, il y a n termes)</small>' },
+
+    { ch: 'ch4', tag: 'Chap 4', q: 'De quelle suite géométrique x ↦ a<sup>x</sup> est-elle le prolongement, et par quels 2 points passe toujours sa courbe ?', a: 'Suite géométrique de 1<sup>er</sup> terme u<sub>0</sub> = 1 et de raison a.<br>Courbe fluide qui passe par <b>(0 ; 1)</b> et <b>(1 ; a)</b>.' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Que valent a<sup>0</sup>, a<sup>1</sup>, 1<sup>x</sup> et a<sup>−x</sup> (avec a > 0) ?', a: 'a<sup>0</sup> = 1 &nbsp;|&nbsp; a<sup>1</sup> = a &nbsp;|&nbsp; 1<sup>x</sup> = 1 (constante) &nbsp;|&nbsp; a<sup>−x</sup> = 1 / a<sup>x</sup>' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Quel est le signe de a<sup>x</sup> pour tout x ∈ ℝ (avec a > 0) ?', a: 'Toujours strictement positif (a<sup>x</sup> > 0).<br>Sa courbe est toujours au-dessus de l’axe des abscisses.' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Règles de même base : a<sup>x</sup> × a<sup>y</sup>, &nbsp; a<sup>x</sup> / a<sup>y</sup> &nbsp; et &nbsp; (a<sup>x</sup>)<sup>y</sup> ?', a: 'a<sup>x+y</sup> &nbsp;|&nbsp; a<sup>x−y</sup> &nbsp;|&nbsp; a<sup>x×y</sup>' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Règles de même exposant : a<sup>x</sup> × b<sup>x</sup> &nbsp; et &nbsp; a<sup>x</sup> / b<sup>x</sup> ?', a: '(a × b)<sup>x</sup> &nbsp;&nbsp;et&nbsp;&nbsp; (a / b)<sup>x</sup>' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Liens racines / puissances : √a, &nbsp; <sup>n</sup>√A, &nbsp; (<sup>n</sup>√A)<sup>n</sup> &nbsp; et &nbsp; (a<sup>n</sup>)<sup>1/n</sup> ?', a: '√a = a<sup>1/2</sup> &nbsp;|&nbsp; <sup>n</sup>√A = A<sup>1/n</sup> &nbsp;|&nbsp; (<sup>n</sup>√A)<sup>n</sup> = A &nbsp;|&nbsp; (a<sup>n</sup>)<sup>1/n</sup> = a' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Sens de variation de x ↦ a<sup>x</sup> sur ℝ ?', a: 'Si a > 1 : strictement croissante.<br>Si 0 < a < 1 : strictement décroissante.' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Effet de k dans x ↦ k × a<sup>x</sup> sur le sens de variation ?', a: 'k > 0 : même sens que x ↦ a<sup>x</sup>.<br>k < 0 : sens de variation contraire !' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'Comment trouver le coefficient multiplicateur moyen C<sub>M</sub> sur n évolutions ?', a: 'C<sub>M</sub><sup>n</sup> = C<sub>1</sub> × C<sub>2</sub> × … × C<sub>n</sub> = C<sub>global</sub>,<br>donc C<sub>M</sub> = <sup>n</sup>√C<sub>global</sub> = (C<sub>global</sub>)<sup>1/n</sup>.' },
+    { ch: 'ch4', tag: 'Chap 4', q: 'À quels taux moyens annuels correspondent C<sub>M</sub> ≈ 1,17 et C<sub>M</sub> ≈ 1,0184 ?', a: 'C<sub>M</sub> ≈ 1,17 → hausse moyenne de <b>17 %</b>.<br>C<sub>M</sub> ≈ 1,0184 → hausse moyenne de <b>1,84 %</b>.' }
+  ];
+
+  let cardFilter = 'all';
+  let deck = [];
+  let mastered = 0;
+  let totalInFilter = 0;
+  let flipped = false;
+
+  function setCardFilter(f, btn) {
+    btn.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    cardFilter = f;
+    resetCards();
+  }
+
+  function resetCards() {
+    deck = allCards.filter(c => cardFilter === 'all' || c.ch === cardFilter);
+    totalInFilter = deck.length;
+    mastered = 0;
+    flipped = false;
+    renderCard();
+  }
+
+  function renderCard() {
+    const fc = document.getElementById('flashcard');
+    const content = document.getElementById('fcContent');
+    const badge = document.getElementById('fcBadge');
+    const hint = document.getElementById('fcHint');
+    const stats = document.getElementById('fcStats');
+
+    stats.textContent = `Maîtrisées : ${mastered} / ${totalInFilter} | Restantes : ${deck.length}`;
+    fc.classList.toggle('flipped', flipped);
+
+    if (deck.length === 0) {
+      badge.textContent = '🎉 Terminé !';
+      content.innerHTML = 'Tu as validé toutes les cartes de cette série !';
+      hint.textContent = 'Clique sur « Tout remettre » pour recommencer.';
+      return;
+    }
+
+    const c = deck[0];
+    badge.textContent = flipped ? `${c.tag} — Réponse` : `${c.tag} — Question`;
+    content.innerHTML = flipped ? c.a : c.q;
+    hint.textContent = flipped ? 'Choisis « À revoir » ou « C’est bon » ci-dessous' : 'Clique sur la carte pour voir la réponse';
+  }
+
+  function flipCard() {
+    if (deck.length === 0) return;
+    flipped = !flipped;
+    renderCard();
+  }
+
+  function markCard(ok) {
+    if (deck.length === 0) return;
+    const current = deck.shift();
+    if (ok) { mastered++; } else { deck.push(current); }
+    flipped = false;
+    renderCard();
+  }
+
+  resetCards();
+
+  // --- GROS QCM (34 QUESTIONS : 16 Chap 3 + 18 Chap 4) ---
+  const allQuiz = [
+    // CHAP 3 (16 questions)
+    {
+      ch: 'ch3', tag: 'Chap 3 — Définition 1',
+      q: 'On définit une suite par u<sub>0</sub> = 3 et, pour tout n ∈ ℕ, u<sub>n+1</sub> = 5 × u<sub>n</sub>. Quelle affirmation est vraie ?',
+      opts: ['(u<sub>n</sub>) est géométrique de premier terme 5 et de raison 3', '(u<sub>n</sub>) est géométrique de premier terme 3 et de raison 5', '(u<sub>n</sub>) n’est pas géométrique'],
+      ans: 1,
+      exp: 'Par définition (u<sub>n+1</sub> = q × u<sub>n</sub>), le nombre qui multiplie u<sub>n</sub> est la raison q = 5, et le premier terme est u<sub>0</sub> = 3.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Calcul de terme',
+      q: 'Une suite géométrique a pour raison q = 1,5 et u<sub>2</sub> = 8. Que vaut u<sub>3</sub> ?',
+      opts: ['9,5', '12', '16'],
+      ans: 1,
+      exp: 'Par définition, u<sub>3</sub> = q × u<sub>2</sub> = 1,5 × 8 = 12.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Méthode quotient',
+      q: 'Pour démontrer qu’une suite (u<sub>n</sub>) à termes non nuls est géométrique, que doit-on montrer ?',
+      opts: ['Que u<sub>n+1</sub> − u<sub>n</sub> est constant', 'Que le quotient u<sub>n+1</sub> / u<sub>n</sub> est constant pour tout n ≥ n<sub>0</sub>', 'Que u<sub>1</sub> / u<sub>0</sub> = u<sub>2</sub>'],
+      ans: 1,
+      exp: 'D’après la Remarque 1, il faut montrer que le quotient u<sub>n+1</sub> / u<sub>n</sub> est constant pour tout n ≥ n<sub>0</sub>.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Démontrer (Exemple 2)',
+      q: 'Soit u<sub>n</sub> = 2 × 3<sup>n</sup>. Que vaut le quotient u<sub>n+1</sub> / u<sub>n</sub> ?',
+      opts: ['2', '3', '6'],
+      ans: 1,
+      exp: 'u<sub>n+1</sub> / u<sub>n</sub> = (2 × 3<sup>n+1</sup>) / (2 × 3<sup>n</sup>) = (3<sup>n</sup> × 3<sup>1</sup>) / 3<sup>n</sup> = 3. C’est constant, donc q = 3.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Moyenne géométrique',
+      q: 'Quelle est la moyenne géométrique des nombres 4 et 9 ?',
+      opts: ['6,5', '6', '13'],
+      ans: 1,
+      exp: 'La moyenne géométrique de a et b positifs vaut √(a × b) = √(4 × 9) = √36 = 6 (attention : 6,5 est la moyenne arithmétique !).'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Moyenne géométrique',
+      q: 'Quelle est la moyenne géométrique de 2 et 50 ?',
+      opts: ['26', '10', '25'],
+      ans: 1,
+      exp: '√(2 × 50) = √100 = 10.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — 3 termes consécutifs',
+      q: 'Les nombres 9, 12 et 16 sont-ils, dans cet ordre, termes consécutifs d’une suite géométrique ?',
+      opts: ['Non', 'Oui, de raison q = 4/3', 'Oui, de raison q = 3'],
+      ans: 1,
+      exp: 'On calcule √(9 × 16) = √144 = 12 (le terme du milieu). C’est donc bien une suite géométrique, de raison q = 12 / 9 = 4 / 3.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — 3 termes consécutifs (piège)',
+      q: 'Les nombres 4, 12 et 25 sont-ils, dans cet ordre, termes consécutifs d’une suite géométrique ?',
+      opts: ['Oui, de raison 3', 'Non, car √(4 × 25) = 10 ≠ 12', 'Oui, de raison 2,5'],
+      ans: 1,
+      exp: 'La moyenne géométrique de 4 et 25 est √(4 × 25) = √100 = 10, différent de 12. Donc Non !'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Terme du milieu',
+      q: 'Les nombres 5, x et 20 (avec x > 0) sont, dans cet ordre, trois termes consécutifs d’une suite géométrique. Que vaut x ?',
+      opts: ['12,5', '10', '15'],
+      ans: 1,
+      exp: 'Le terme du milieu vaut la moyenne géométrique des deux extrêmes : x = √(5 × 20) = √100 = 10.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Formule explicite (u₀)',
+      q: 'Soit (u<sub>n</sub>) géométrique de premier terme u<sub>0</sub> = 3 et de raison q = 2. Que vaut u<sub>5</sub> ?',
+      opts: ['30', '96', '48'],
+      ans: 1,
+      exp: 'On utilise u<sub>n</sub> = u<sub>0</sub> × q<sup>n</sup> : u<sub>5</sub> = 3 × 2<sup>5</sup> = 3 × 32 = 96.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Formule à partir de u₁',
+      q: 'Pour une suite géométrique telle que u<sub>1</sub> = 5 et q = 2, que vaut u<sub>4</sub> ?',
+      opts: ['40', '80', '20'],
+      ans: 0,
+      exp: 'D’après u<sub>n</sub> = u<sub>1</sub> × q<sup>n−1</sup>, on a : u<sub>4</sub> = 5 × 2<sup>4−1</sup> = 5 × 2<sup>3</sup> = 5 × 8 = 40.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Formule générale (uₚ)',
+      q: 'Pour une suite géométrique avec u<sub>3</sub> = 4 et q = 3, quel calcul donne u<sub>7</sub> ?',
+      opts: ['4 × 3<sup>7</sup>', '4 × 3<sup>4</sup> = 324', '4 × 3<sup>3</sup> = 108'],
+      ans: 1,
+      exp: 'Avec u<sub>n</sub> = u<sub>p</sub> × q<sup>n−p</sup> (n = 7 et p = 3) : u<sub>7</sub> = u<sub>3</sub> × q<sup>7−3</sup> = 4 × 3<sup>4</sup> = 4 × 81 = 324.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Graphique & vocabulaire',
+      q: 'Comment représente-t-on une suite géométrique et comment appelle-t-on ce phénomène d’évolution ?',
+      opts: ['Une droite ; croissance linéaire', 'Des points isolés (non reliés) ; croissance exponentielle', 'Une courbe continue ; croissance exponentielle'],
+      ans: 1,
+      exp: 'On place des points isolés (n ; u<sub>n</sub>) sans les relier, et le phénomène est dit à croissance exponentielle.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Somme (u₀ = 1)',
+      q: 'Soit u<sub>0</sub> = 1 et q = 2. Combien vaut la somme S = u<sub>0</sub> + u<sub>1</sub> + … + u<sub>9</sub> ?',
+      opts: ['511 (9 termes)', '1 023 (10 termes)', '2 047 (11 termes)'],
+      ans: 1,
+      exp: 'De u<sub>0</sub> à u<sub>9</sub>, il y a 10 termes ! S = 1 × (1 − 2<sup>10</sup>) / (1 − 2) = 2<sup>10</sup> − 1 = 1024 − 1 = 1 023.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Somme (u₀ ≠ 1)',
+      q: 'Soit u<sub>0</sub> = 3 et q = 2. Quel calcul donne la somme S = u<sub>0</sub> + u<sub>1</sub> + … + u<sub>7</sub> ?',
+      opts: ['3 × (1 − 2<sup>7</sup>) / (1 − 2)', '3 × (1 − 2<sup>8</sup>) / (1 − 2)', '1 × (1 − 2<sup>8</sup>) / (1 − 2)'],
+      ans: 1,
+      exp: 'Premier terme = u<sub>0</sub> = 3, et de u<sub>0</sub> à u<sub>7</sub> il y a 8 termes : S = 3 × (1 − 2<sup>8</sup>) / (1 − 2) = 765.'
+    },
+    {
+      ch: 'ch3', tag: 'Chap 3 — Somme depuis u₁',
+      q: 'Soit (u<sub>n</sub>) géométrique de raison q = 3 avec u<sub>1</sub> = 2. Quel calcul donne S = u<sub>1</sub> + u<sub>2</sub> + … + u<sub>6</sub> ?',
+      opts: ['2 × (1 − 3<sup>5</sup>) / (1 − 3)', '2 × (1 − 3<sup>6</sup>) / (1 − 3)', '2 × (1 − 3<sup>7</sup>) / (1 − 3)'],
+      ans: 1,
+      exp: 'Premier terme de la somme = u<sub>1</sub> = 2, et de u<sub>1</sub> à u<sub>6</sub> il y a exactement 6 termes : 2 × (1 − 3<sup>6</sup>) / (1 − 3).'
+    },
+
+    // CHAP 4 (18 questions)
+    {
+      ch: 'ch4', tag: 'Chap 4 — Introduction & Définition',
+      q: 'La fonction exponentielle de base a (x ↦ a<sup>x</sup>) est le prolongement par une courbe fluide de quelle suite géométrique ?',
+      opts: ['Premier terme u<sub>0</sub> = a et raison 1', 'Premier terme u<sub>0</sub> = 1 et raison a', 'Premier terme u<sub>0</sub> = 0 et raison a'],
+      ans: 1,
+      exp: 'D’après la Définition 1, c’est le prolongement de la suite géométrique de premier terme u<sub>0</sub> = 1 et de raison a (d’où les points (0 ; 1) et (1 ; a)).'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Exposant négatif',
+      q: 'D’après la Définition 1 (a<sup>−x</sup> = 1 / a<sup>x</sup>), que vaut 2<sup>−3</sup> sous forme décimale exacte ?',
+      opts: ['−6', '0,125', '−8'],
+      ans: 1,
+      exp: '2<sup>−3</sup> = 1 / 2<sup>3</sup> = 1 / 8 = 0,125.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Valeurs & signe',
+      q: 'Soit f(x) = 1,2<sup>x</sup>. Que vaut f(0) et quel est le signe de f(−50) ?',
+      opts: ['f(0) = 0 et f(−50) < 0', 'f(0) = 1 et f(−50) > 0', 'f(0) = 1,2 et f(−50) > 0'],
+      ans: 1,
+      exp: 'Pour tout a > 0, a<sup>0</sup> = 1 (donc f(0) = 1) et a<sup>x</sup> > 0 pour tout réel x, même négatif !'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Cas particulier a = 1',
+      q: 'Que peut-on dire de la fonction f définie sur ℝ par f(x) = 1<sup>x</sup> ?',
+      opts: ['Elle est strictement croissante', 'C’est la fonction constante égale à 1', 'Elle est strictement décroissante'],
+      ans: 1,
+      exp: 'D’après la Remarque 1, pour tout réel x, 1<sup>x</sup> = 1 : c’est donc la fonction constante égale à 1.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Produit même base',
+      q: 'Simplifie 3<sup>1,8</sup> × 3<sup>2,2</sup> sous la forme a<sup>x</sup> :',
+      opts: ['3<sup>4</sup>', '9<sup>4</sup>', '3<sup>3,96</sup>'],
+      ans: 0,
+      exp: 'On applique a<sup>x</sup> × a<sup>y</sup> = a<sup>x+y</sup> : 3<sup>1,8 + 2,2</sup> = 3<sup>4</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Quotient même base',
+      q: 'Simplifie <span class="frac"><span>5<sup>1,2</sup></span><span>5<sup>−2,2</sup></span></span> sous la forme a<sup>x</sup> :',
+      opts: ['5<sup>−1</sup>', '5<sup>3,4</sup>', '5<sup>4</sup>'],
+      ans: 1,
+      exp: 'On applique a<sup>x</sup> / a<sup>y</sup> = a<sup>x−y</sup> : 5<sup>1,2 − (−2,2)</sup> = 5<sup>1,2 + 2,2</sup> = 5<sup>3,4</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Inverse puissance négative',
+      q: 'Comment s’écrit <span class="frac"><span>1</span><span>0,56<sup>−2</sup></span></span> sous la forme a<sup>x</sup> ?',
+      opts: ['0,56<sup>−2</sup>', '0,56<sup>2</sup>', '−0,56<sup>2</sup>'],
+      ans: 1,
+      exp: 'Puisque 1 / a<sup>x</sup> = a<sup>−x</sup>, alors 1 / 0,56<sup>−2</sup> = 0,56<sup>−(−2)</sup> = 0,56<sup>2</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Puissance de puissance',
+      q: 'Simplifie (5,7<sup>−3</sup>)<sup>0,2</sup> sous la forme a<sup>x</sup> :',
+      opts: ['5,7<sup>−2,8</sup>', '5,7<sup>−0,6</sup>', '5,7<sup>0,6</sup>'],
+      ans: 1,
+      exp: 'On applique (a<sup>x</sup>)<sup>y</sup> = a<sup>x×y</sup> : 5,7<sup>−3 × 0,2</sup> = 5,7<sup>−0,6</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Produit même exposant',
+      q: 'Simplifie 3<sup>1,4</sup> × 2,1<sup>1,4</sup> sous la forme a<sup>x</sup> :',
+      opts: ['6,3<sup>2,8</sup>', '6,3<sup>1,4</sup>', '5,1<sup>1,4</sup>'],
+      ans: 1,
+      exp: 'On applique a<sup>x</sup> × b<sup>x</sup> = (a × b)<sup>x</sup> : (3 × 2,1)<sup>1,4</sup> = 6,3<sup>1,4</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Quotient même exposant',
+      q: 'Simplifie <span class="frac"><span>3,6<sup>1,01</sup></span><span>0,9<sup>1,01</sup></span></span> sous la forme a<sup>x</sup> :',
+      opts: ['4<sup>1,01</sup>', '2,7<sup>1,01</sup>', '4<sup>0</sup>'],
+      ans: 0,
+      exp: 'On utilise a<sup>x</sup> / b<sup>x</sup> = (a / b)<sup>x</sup> : (3,6 / 0,9)<sup>1,01</sup> = 4<sup>1,01</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Calcul mixte',
+      q: 'Simplifie <span class="frac"><span>2,3<sup>4,1</sup> × 2,3<sup>3,2</sup></span><span>2,3<sup>1,56</sup></span></span> sous la forme a<sup>x</sup> :',
+      opts: ['2,3<sup>5,74</sup>', '2,3<sup>8,86</sup>', '2,3<sup>7,3</sup>'],
+      ans: 0,
+      exp: 'Numérateur : 2,3<sup>4,1+3,2</sup> = 2,3<sup>7,3</sup>. Puis on soustrait l’exposant du bas : 2,3<sup>7,3 − 1,56</sup> = 2,3<sup>5,74</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Racine & puissance',
+      q: 'Simplifie (√3<sup>1,2</sup>)<sup>5</sup> sous la forme a<sup>x</sup> :',
+      opts: ['3<sup>3</sup>', '3<sup>6</sup>', '3<sup>1,7</sup>'],
+      ans: 0,
+      exp: 'Comme √3 = 3<sup>1/2</sup>, on obtient ((3<sup>1/2</sup>)<sup>1,2</sup>)<sup>5</sup> = 3<sup>0,5 × 1,2 × 5</sup> = 3<sup>0,6 × 5</sup> = 3<sup>3</sup>.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Racine n-ième',
+      q: 'Pour A > 0 et n entier naturel non nul, quelles égalités sont vraies ?',
+      opts: ['<sup>n</sup>√A = A<sup>n</sup> et (<sup>n</sup>√A)<sup>n</sup> = A', '<sup>n</sup>√A = A<sup>1/n</sup> et (<sup>n</sup>√A)<sup>n</sup> = A', '<sup>n</sup>√A = A<sup>−n</sup> et (<sup>n</sup>√A)<sup>n</sup> = 1'],
+      ans: 1,
+      exp: 'D’après la Conséquence et l’encadré du cours : <sup>n</sup>√A = A<sup>1/n</sup> et (<sup>n</sup>√A)<sup>n</sup> = A.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Courbe & sens de variation',
+      q: 'Quel est le sens de variation de x ↦ 0,7<sup>x</sup> sur ℝ, et sa courbe coupe-t-elle l’axe des abscisses ?',
+      opts: ['Strictement croissante ; oui en 0', 'Strictement décroissante ; non jamais', 'Strictement décroissante ; oui pour x < 0'],
+      ans: 1,
+      exp: '0 < 0,7 < 1 donc elle est strictement décroissante sur ℝ. Comme 0,7<sup>x</sup> > 0 pour tout x, la courbe ne coupe jamais l’axe des abscisses.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Variations (a > 1, k > 0)',
+      q: 'Quel est le sens de variation de h(x) = 3 × 1,2<sup>x</sup> sur ℝ ?',
+      opts: ['Strictement croissante sur ℝ', 'Strictement décroissante sur ℝ', 'Constante'],
+      ans: 0,
+      exp: 'a = 1,2 > 1 donc 1,2<sup>x</sup> est strictement croissante. Comme k = 3 > 0, on garde le même sens : strictement croissante sur ℝ.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Variations (a > 1, k < 0)',
+      q: 'Quel est le sens de variation de f(x) = −0,5 × 4<sup>x</sup> sur ℝ ?',
+      opts: ['Strictement croissante sur ℝ', 'Strictement décroissante sur ℝ', 'Décroissante puis croissante'],
+      ans: 1,
+      exp: 'a = 4 > 1 donc x ↦ 4<sup>x</sup> est strictement croissante. Comme k = −0,5 < 0, on change de sens : f est strictement décroissante sur ℝ.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Variations (0 < a < 1, k < 0)',
+      q: 'Quel est le sens de variation de g(x) = −5 × 0,4<sup>x</sup> sur ℝ ?',
+      opts: ['Strictement croissante sur ℝ', 'Strictement décroissante sur ℝ', 'Constante'],
+      ans: 0,
+      exp: '0 < a = 0,4 < 1 donc x ↦ 0,4<sup>x</sup> est strictement décroissante. Comme k = −5 < 0, on inverse le sens : g est strictement croissante sur ℝ.'
+    },
+    {
+      ch: 'ch4', tag: 'Chap 4 — Taux d’évolution moyen (Cas A & B)',
+      q: 'Un produit subit trois hausses (+16 %, +15 %, +20 %) soit × 1,6008 au total. Quelle équation donne C<sub>M</sub> ?',
+      opts: ['C<sub>M</sub> = 1,6008 / 3', 'C<sub>M</sub><sup>3</sup> = 1,6008 ⇒ C<sub>M</sub> = <sup>3</sup>√1,6008 ≈ 1,17 (hausse de 17 %)', 'C<sub>M</sub> = 1,6008<sup>3</sup>'],
+      ans: 1,
+      exp: 'D’après la Propriété 4 : C<sub>M</sub><sup>3</sup> = 1,16 × 1,15 × 1,20 = 1,6008, donc C<sub>M</sub> = <sup>3</sup>√1,6008 ≈ 1,17 (taux moyen : +17 % par an).'
+    }
+  ];
+
+  let quizFilter = 'all';
+  let currentQuiz = [];
+  let qIdx = 0;
+  let score = 0;
+  let mistakes = [];
+
+  function setQuizFilter(f, btn) {
+    btn.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    quizFilter = f;
+    restartQuiz();
+  }
+
+  function restartQuiz() {
+    currentQuiz = allQuiz.filter(q => quizFilter === 'all' || q.ch === quizFilter);
+    qIdx = 0;
+    score = 0;
+    mistakes = [];
+    renderQuiz();
+  }
+
+  function renderQuiz() {
+    const box = document.getElementById('quizBox');
+    if (qIdx >= currentQuiz.length) {
+      const pct = Math.round((score / currentQuiz.length) * 100);
+      let msg = pct >= 80 ? '🔥 Excellent ! Tu maîtrises l’intégralité des deux chapitres.' : pct >= 50 ? '👍 C’est sur la bonne voie ! Revois les points ci-dessous.' : '💪 Relis tranquillement les Fiches Détaillées et retente le QCM !';
+      let mistakesHtml = '';
+      if (mistakes.length > 0) {
+        mistakesHtml = '<div class="mistake-list"><b>📌 À revoir d’après tes réponses :</b>' +
+          mistakes.map(m => `<div class="mistake-item"><b>${m.q}</b><br><span style="color:#86efac">✔ Bonne réponse : ${m.opts[m.ans]}</span><br><small style="color:#cbd5e1">${m.exp}</small></div>`).join('') +
+          '</div>';
+      }
+      box.innerHTML = `
+        <div class="score-box">
+          <div class="score-big">${score} / ${currentQuiz.length}</div>
+          <p>${msg}</p>
+          <button class="btn btn-ok" onclick="restartQuiz()">↺ Recommencer ce QCM</button>
+          ${mistakesHtml}
+        </div>`;
+      return;
+    }
+
+    const item = currentQuiz[qIdx];
+    const progressPct = Math.round((qIdx / currentQuiz.length) * 100);
+    box.innerHTML = `
+      <div class="q-head">
+        <span>Question ${qIdx + 1} / ${currentQuiz.length}</span>
+        <span>Score : ${score}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+      <div class="q-tag">${item.tag}</div>
+      <div class="q-text">${item.q}</div>
+      <div class="opts">
+        ${item.opts.map((o, i) => `<button class="opt" onclick="answerQuiz(${i}, this)">${o}</button>`).join('')}
+      </div>
+      <div class="explain" id="qExp">💡 <b>Méthode :</b> ${item.exp}</div>
+      <button class="btn next-btn" id="qNext" onclick="nextQuiz()">${qIdx + 1 === currentQuiz.length ? 'Voir le bilan →' : 'Question suivante →'}</button>
+    `;
+  }
+
+  function answerQuiz(choice, btn) {
+    const item = currentQuiz[qIdx];
+    const buttons = document.querySelectorAll('.opt');
+    buttons.forEach(b => b.disabled = true);
+
+    if (choice === item.ans) {
+      btn.classList.add('correct');
+      score++;
+    } else {
+      btn.classList.add('wrong');
+      buttons[item.ans].classList.add('correct');
+      mistakes.push(item);
+    }
+    document.getElementById('qExp').style.display = 'block';
+    document.getElementById('qNext').style.display = 'block';
+  }
+
+  function nextQuiz() {
+    qIdx++;
+    renderQuiz();
+  }
+
+  restartQuiz();
+</script>
+</body>
+</html>
